@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Asimovian&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cossette+Titre:wght@400;700&display=swap');
 
 body{
     font-family: "Asimovian", sans-serif;
@@ -42,6 +43,17 @@ body{
 
 .tarjeta-de-mokepon img{
     width: 80px;
+}
+
+#boton_mascota {
+    font-family: "Cossette Titre", sans-serif;
+    width: 180px;
+    height: 40px;
+    border-radius: 20px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    margin: 30px 0px 0px 0px;
 }
 
 input {
