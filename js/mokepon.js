@@ -23,17 +23,20 @@ const contenedorAtaques = document.getElementById("contenedorAtaques")
 
 let mokepones = []
 let ataquejugador = []
-let ataqueEnemigo
+let ataqueEnemigo = []
 let opcionDeMokepones
 let inputHipodoge 
 let inputCapipepo 
 let inputRatigueta
 let mascotajugador 
 let ataquesMokepon
+let ataquesMokeponEnemigo
 let botonTierra
 let botonFuego 
 let botonAgua
 let botones = []
+let indexAtaqueJugador
+let indexAtaqueEnemigo
 let vidasJugador = 3
 let vidasEnemigo = 3
 
@@ -167,51 +170,52 @@ function secuenciaAtaque() {
                 console.log(ataquejugador)
                 boton.style.background = "#112f58"
             }
+            ataquealeatorioEnemigo()
        }) 
     })
 }
 
 function seleccionarMascotaEnemigo() {
     let mascotaleatorio = aleatorio(0, mokepones.length -1)
-
+    
     spanMascotaEnemigo.innerHTML = mokepones[mascotaleatorio].nombre
+    ataquesMokeponEnemigo = mokepones[mascotaleatorio].ataques
     secuenciaAtaque()
 }
 
 function ataquealeatorioEnemigo(){
-    let ataquealeatorio = aleatorio (1,3)
+    let ataquealeatorio = aleatorio (0, ataquesMokeponEnemigo.length -1)
 
-    if (ataquealeatorio == 1) {
-        ataqueEnemigo = "FUEGO"
-    } else if (ataquealeatorio == 2){
-        ataqueEnemigo = "AGUA"
+    if (ataquealeatorio == 0 || ataquealeatorio ==1) {
+        ataqueEnemigo.push("FUEGO")
+    } else if (ataquealeatorio == 3 || ataquealeatorio ==4) {
+        ataqueEnemigo.push("AGUA")
     } else {
-        ataqueEnemigo = "TIERRA"
+        ataqueEnemigo.push("TIERRA")
     }
+    iniciarPelea()
+}
 
-    combate()
+function iniciarPelea(){
+    if (ataquejugador.length === 5) {
+        combate()
+    }
+}
+
+function indexAmbosOponentes (jugador, enemigo) {
+    indexAtaqueJugador = ataquejugador[jugador]
+    indexAtaqueEnemigo = ataqueEnemigo[enemigo]
+    
 }
 
 function combate(){
 
-    if(ataqueEnemigo == ataquejugador){
-         crearmensaje ("Empate")
-    } else if (ataquejugador == "FUEGO" && ataqueEnemigo == "TIERRA") {
-        crearmensaje ("Ganaste")
-        vidasEnemigo --
-        sapmVidasEnemigo.innerHTML = vidasEnemigo
-    } else if (ataquejugador == "AGUA" && ataqueEnemigo == "FUEGO") {
-        crearmensaje ("Ganaste")
-        vidasEnemigo --
-        sapmVidasEnemigo.innerHTML = vidasEnemigo
-    } else if (ataquejugador == "TIERRA" && ataqueEnemigo == "AGUA") {
-        crearmensaje ("Ganaste")
-        vidasEnemigo --
-        sapmVidasEnemigo.innerHTML = vidasEnemigo
-    } else {
-        crearmensaje("Perdiste")
-        vidasJugador --
-        sapmVidasJugador.innerHTML = vidasJugador
+    for (let index = 0; index < ataquejugador.length; index++) {
+        if(ataquejugador[index] === ataqueEnemigo[index]){
+            indexAmbosOponentes(index, index)
+            crearmensaje ("Empate")
+        }
+        
     }
 
     revisarvidas()
@@ -231,8 +235,8 @@ function crearmensaje(resultado) {
     let nuevoataquedelenemigo = document.createElement("p")
 
     sectionMensajes.innerHTML = resultado
-    nuevoataquedeljugar.innerHTML = ataquejugador
-    nuevoataquedelenemigo.innerHTML = ataqueEnemigo
+    nuevoataquedeljugar.innerHTML = indexAtaqueJugador
+    nuevoataquedelenemigo.innerHTML = indexAtaqueEnemigo
 
     ataquesdeljugador.appendChild(nuevoataquedeljugar)
     ataquesdelenemigo.appendChild(nuevoataquedelenemigo)
