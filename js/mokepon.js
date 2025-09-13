@@ -21,6 +21,9 @@ const ataquesdelenemigo = document.getElementById("ataques-del-enemigo")
 const contenedortarjetas = document.getElementById("contenedortarjetas")
 const contenedorAtaques = document.getElementById("contenedorAtaques")
 
+const sectionVerMapa = document.getElementById("ver-mapa")
+const mapa = document.getElementById("mapa")
+
 let mokepones = []
 let ataquejugador = []
 let ataqueEnemigo = []
@@ -37,15 +40,24 @@ let botonAgua
 let botones = []
 let indexAtaqueJugador
 let indexAtaqueEnemigo
+let victoriasJugador = 0
+let victoriasEnemigo = 0
 let vidasJugador = 3
 let vidasEnemigo = 3
+let lienzo = mapa.getContext("2d")
 
 class Mokepon {
     constructor(nombre, foto, vida) {
         this.nombre = nombre
         this.foto = foto
         this.vida = vida
-        this.ataques = [] 
+        this.ataques = []
+        this.x = 20
+        this.y = 30
+        this.ancho = 80
+        this.alto = 80
+        this.mapaFoto = new Image()
+        this.mapaFoto.src = foto
     }
 }
 
@@ -84,6 +96,7 @@ mokepones.push(hipodoge, capipepo, ratigueta)
 function iniciarjuego () {
     
     sectionseleccionarataque.style.display = "none"
+    sectionVerMapa.style.display = "none"
     
     mokepones.forEach((mokepon) => {
         opcionDeMokepones = `
@@ -106,10 +119,17 @@ function iniciarjuego () {
     botonReiniciar.addEventListener("click", reiniciarJuego)
 }
 
+
+
 function seleccionarMascotaJugador() {
     
     sectionseleccionarmascota.style.display = "none"    
-    sectionseleccionarataque.style.display = "flex"
+
+
+    //sectionseleccionarataque.style.display = "flex"
+    sectionVerMapa.style.display = "flex"
+    
+
 
     if (inputHipodoge.checked) {
        spanMascotaJugador.innerHTML = inputHipodoge.id
@@ -141,7 +161,7 @@ function extraerAtaques(mascotajugador) {
 function mostrarAtaques(ataques) {
     ataques.forEach((ataque) => {
         ataquesMokepon = `
-        <button id= ${ataque.id} class="boton_de_ataque BAtaque"> ${ataque.nombre} </button>
+        <button id="${ataque.id}" class="boton_de_ataque BAtaque">${ataque.nombre}</button>
         `
         contenedorAtaques.innerHTML += ataquesMokepon
     }) 
@@ -156,19 +176,21 @@ function mostrarAtaques(ataques) {
 function secuenciaAtaque() {
     botones.forEach((boton) => {
        boton.addEventListener("click", (e) => {
-            if(e.target.texContent === "🔥") {
+            if(e.target.textContent === "🔥") {
                 ataquejugador.push("FUEGO")
                 console.log(ataquejugador)
                 boton.style.background = "#112f58"
-
-            }else if (e.target.texContent === "💧") {
+                boton.disabled = true
+            }else if (e.target.textContent === "💧") {
                 ataquejugador.push("AGUA")
                 console.log(ataquejugador)
                 boton.style.background = "#112f58"
+                boton.disabled = true
             }else { 
                 ataquejugador.push("TIERRA")
                 console.log(ataquejugador)
                 boton.style.background = "#112f58"
+                boton.disabled = true
             }
             ataquealeatorioEnemigo()
        }) 
@@ -184,7 +206,7 @@ function seleccionarMascotaEnemigo() {
 }
 
 function ataquealeatorioEnemigo(){
-    let ataquealeatorio = aleatorio (0, ataquesMokeponEnemigo.length -1)
+    let ataquealeatorio = aleatorio (0, ataquesMokeponEnemigo.length - 1)
 
     if (ataquealeatorio == 0 || ataquealeatorio ==1) {
         ataqueEnemigo.push("FUEGO")
@@ -213,19 +235,40 @@ function combate(){
     for (let index = 0; index < ataquejugador.length; index++) {
         if(ataquejugador[index] === ataqueEnemigo[index]){
             indexAmbosOponentes(index, index)
-            crearmensaje ("Empate")
+            crearmensaje ("EMPATE")
+        } else if (ataquejugador[index] === "FUEGO" && ataqueEnemigo[index] === "TIERRA") {
+            indexAmbosOponentes(index, index)
+            crearmensaje ("GANASTE")
+            victoriasJugador++
+            sapmVidasJugador.innerHTML = victoriasJugador
+        } else if (ataquejugador[index] === "AGUA" && ataqueEnemigo[index] === "FUEGO") {
+            indexAmbosOponentes(index, index)
+            crearmensaje ("GANASTE")
+            victoriasJugador++
+            sapmVidasJugador.innerHTML = victoriasJugador
+        } else if (ataquejugador[index] === "TIERRA" && ataqueEnemigo[index] === "AGUA") {
+            indexAmbosOponentes(index, index)
+            crearmensaje ("GANASTE")
+            victoriasJugador++
+            sapmVidasJugador.innerHTML = victoriasJugador
+        } else {
+            indexAmbosOponentes(index, index)
+            crearmensaje ("PERDISTE")
+            victoriasEnemigo++
+            sapmVidasEnemigo.innerHTML = victoriasEnemigo
         }
-        
     }
 
-    revisarvidas()
+    revisarvictorias()
 }
 
-function revisarvidas () {
-    if (vidasEnemigo == 0){
-        crearmensajefinal("Felicitaciones, GANASTE")
-    } else if (vidasJugador == 0) {
-        crearmensajefinal("Lo siento, PERDISTE")
+function revisarvictorias () {
+    if (victoriasJugador == victoriasEnemigo){
+        crearmensajefinal("Esto fue un empate")
+    } else if (victoriasJugador > victoriasEnemigo) {
+        crearmensajefinal("FELICIDADES, GANASTE")
+    } else {
+        crearmensajefinal("PERDISTE")
     }
 }
 
@@ -246,10 +289,6 @@ function crearmensajefinal(resultadoFinal) {
     
     sectionMensajes.innerHTML = resultadoFinal
 
-    botonFuego.disabled = true
-    botonAgua.disabled = true    
-    botonTierra.disabled = true
-
     sectionreiniciar.style.display = "block"
 }
 
@@ -260,4 +299,21 @@ function reiniciarJuego () {
 function aleatorio(min, max) {
     return Math.floor(Math.random() * (max - min + 1)+min)
 }
+
+function pintarPersonaje() {
+    lienzo.clearRect (0, 0, mapa.width, mapa.height)
+    lienzo.drawImage(
+        capipepo.mapaFoto,
+        capipepo.x,
+        capipepo.y,
+        capipepo.ancho,
+        capipepo.alto,
+    )
+}
+
+function moverCapipepo() {
+    capipepo.x = capipepo.x + 5
+    pintarPersonaje()
+}
+
 window.addEventListener("load", iniciarjuego)
