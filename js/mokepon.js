@@ -51,17 +51,29 @@ let lienzo = mapa.getContext("2d")
 let intervalo
 let mapaBackGround =new Image()
 mapaBackGround.src = "./assets/mokemap.png"
+let alturaQueBuscamos
+let anchoDelMapa = window.innerWidth - 20
+const anchoMaximoDelMapa = 350
+
+if (anchoDelMapa > anchoMaximoDelMapa) {
+    anchoDelMapa = anchoMaximoDelMapa - 20
+}
+
+alturaQueBuscamos = anchoDelMapa * 600 / 800
+
+mapa.width = anchoDelMapa
+mapa.height = alturaQueBuscamos
 
 class Mokepon {
-    constructor(nombre, foto, vida, fotoMapa, x = 10, y = 10) {
+    constructor(nombre, foto, vida, fotoMapa) {
         this.nombre = nombre
         this.foto = foto
         this.vida = vida
         this.ataques = []
-        this.x = x
-        this.y = y
         this.ancho = 40
         this.alto = 40
+        this.x = aleatorio(0, mapa.width - this.ancho)
+        this.y = aleatorio(0, mapa.height - this.alto)
         this.mapaFoto = new Image()
         this.mapaFoto.src = fotoMapa
         this.VelocidadX = 0
@@ -85,13 +97,21 @@ let capipepo = new Mokepon ("Capipepo", "./assets/mokepons_mokepon_capipepo_atta
 
 let ratigueta = new Mokepon ("Ratigueta", "./assets/mokepons_mokepon_ratigueya_attack.webp", 5, "./assets/ratigueya.png")
 
-let hipodogEnemigo = new Mokepon ("Hipodoge", "./assets/mokepons_mokepon_hipodoge_attack.webp", 5, "./assets/hipodoge.png", 80, 120)
+let hipodogEnemigo = new Mokepon ("Hipodoge", "./assets/mokepons_mokepon_hipodoge_attack.webp", 5, "./assets/hipodoge.png")
 
-let capipepoEnemigo = new Mokepon ("Capipepo", "./assets/mokepons_mokepon_capipepo_attack.webp", 5, "./assets/capipepo.png", 150, 95)
+let capipepoEnemigo = new Mokepon ("Capipepo", "./assets/mokepons_mokepon_capipepo_attack.webp", 5, "./assets/capipepo.png")
 
-let ratiguetaEnemigo = new Mokepon ("Ratigueta", "./assets/mokepons_mokepon_ratigueya_attack.webp", 5, "./assets/ratigueya.png", 200, 190)
+let ratiguetaEnemigo = new Mokepon ("Ratigueta", "./assets/mokepons_mokepon_ratigueya_attack.webp", 5, "./assets/ratigueya.png")
 
 hipodoge.ataques.push(
+    {nombre: "💧", id: "boton_agua"},
+    {nombre: "💧", id: "boton_agua"},
+    {nombre: "💧", id: "boton_agua"},
+    {nombre: "🪨", id: "boton_tierra"},
+    {nombre: "🔥", id: "boton_fuego"},
+)
+
+hipodogEnemigo.ataques.push(
     {nombre: "💧", id: "boton_agua"},
     {nombre: "💧", id: "boton_agua"},
     {nombre: "💧", id: "boton_agua"},
@@ -107,7 +127,23 @@ capipepo.ataques.push(
     {nombre: "🔥", id: "boton_fuego"},
 )
 
+capipepoEnemigo.ataques.push(
+    {nombre: "🪨", id: "boton_tierra"},
+    {nombre: "🪨", id: "boton_tierra"},
+    {nombre: "🪨", id: "boton_tierra"},
+    {nombre: "💧", id: "boton_agua"},
+    {nombre: "🔥", id: "boton_fuego"},
+)
+
 ratigueta.ataques.push(
+    {nombre: "🔥", id: "boton_fuego"},
+    {nombre: "🔥", id: "boton_fuego"},
+    {nombre: "🔥", id: "boton_fuego"},
+    {nombre: "🪨", id: "boton_tierra"},
+    {nombre: "💧", id: "boton_agua"},
+)
+
+ratiguetaEnemigo.ataques.push(
     {nombre: "🔥", id: "boton_fuego"},
     {nombre: "🔥", id: "boton_fuego"},
     {nombre: "🔥", id: "boton_fuego"},
@@ -143,14 +179,9 @@ function iniciarjuego () {
     botonReiniciar.addEventListener("click", reiniciarJuego)
 }
 
-
-
 function seleccionarMascotaJugador() {
     
     sectionseleccionarmascota.style.display = "none"    
-
-
-    //sectionseleccionarataque.style.display = "flex"
 
     if (inputHipodoge.checked) {
        spanMascotaJugador.innerHTML = inputHipodoge.id
@@ -168,7 +199,6 @@ function seleccionarMascotaJugador() {
     extraerAtaques(mascotajugador)
     sectionVerMapa.style.display = "flex"
     iniciarMapa()
-    seleccionarMascotaEnemigo()
 }
 
 function extraerAtaques(mascotajugador) {
@@ -220,15 +250,13 @@ function secuenciaAtaque() {
     })
 }
 
-function seleccionarMascotaEnemigo() {
-    let mascotaleatorio = aleatorio(0, mokepones.length -1)
-    
-    spanMascotaEnemigo.innerHTML = mokepones[mascotaleatorio].nombre
-    ataquesMokeponEnemigo = mokepones[mascotaleatorio].ataques
+function seleccionarMascotaEnemigo(enemigo) {
+    spanMascotaEnemigo.innerHTML = enemigo.nombre
+    ataquesMokeponEnemigo = enemigo.ataques
     secuenciaAtaque()
 }
 
-function ataquealeatorioEnemigo(){
+function ataquealeatorioEnemigo() {
     let ataquealeatorio = aleatorio (0, ataquesMokeponEnemigo.length - 1)
 
     if (ataquealeatorio == 0 || ataquealeatorio ==1) {
@@ -339,6 +367,11 @@ function pintarCanvas() {
     hipodogEnemigo.pintarMokepon()
     capipepoEnemigo.pintarMokepon()
     ratiguetaEnemigo.pintarMokepon()
+    if (mascotaDeJugadorObjeto.VelocidadX !== 0 || mascotaDeJugadorObjeto.VelocidadY !== 0) {
+        revisarColision(hipodogEnemigo)
+        revisarColision(capipepoEnemigo)
+        revisarColision(ratiguetaEnemigo)
+    }
 }
 function moverArriba() {
     mascotaDeJugadorObjeto.VelocidadY = -5
@@ -381,8 +414,7 @@ function sePresionoUnaTecla(event) {
 }
 
 function iniciarMapa() {
-    mapa.width = 320
-    mapa.height = 240
+
     mascotaDeJugadorObjeto = obtenerObjetoMascota(mascotajugador)
     intervalo = setInterval(pintarCanvas, 50)
 
@@ -397,6 +429,33 @@ function obtenerObjetoMascota() {
             return mokepones[i]
         }
     }
+}
+
+function revisarColision(enemigo){
+    const arribaEnemigo = enemigo.y
+    const abajoEnemigo = enemigo.y + enemigo.alto
+    const derechaEnemigo = enemigo.x + enemigo.ancho
+    const izquierdaEnemigo = enemigo.x
+
+    const arribaMascota = mascotaDeJugadorObjeto.y
+    const abajoMascota = mascotaDeJugadorObjeto.y + mascotaDeJugadorObjeto.alto
+    const derechaMascota = mascotaDeJugadorObjeto.x + mascotaDeJugadorObjeto.ancho
+    const izquierdaMascota = mascotaDeJugadorObjeto.x
+    
+    if(
+        abajoMascota < arribaEnemigo ||
+        arribaMascota > abajoEnemigo ||
+        derechaMascota < izquierdaEnemigo ||
+        izquierdaMascota > derechaEnemigo 
+    ) {
+        return
+    }
+
+    detenerMovimiento()
+    clearInterval(intervalo)
+    sectionseleccionarataque.style.display = "flex"
+    sectionVerMapa.style.display = "none"
+    seleccionarMascotaEnemigo(enemigo)
 }
 
 window.addEventListener("load", iniciarjuego)
