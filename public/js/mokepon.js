@@ -1,3 +1,5 @@
+const URL = `${window.location.origin}`;
+
 const sectionseleccionarataque = document.getElementById("seleccionar_ataque")
 const sectionreiniciar = document.getElementById("boton_reiniciar")
 const botonMascotaJugador = document.getElementById("boton_mascota")
@@ -171,7 +173,7 @@ function iniciarjuego () {
 
 function unirseAlJuego () {
     //cambiar local-host por la ip del wifi al que este conectado
-    fetch("http://192.168.1.60:8080/unirse")
+    fetch(`${URL}/unirse`)
         .then(function(res) {
             if (res.ok) {
                 res.text()
@@ -209,7 +211,7 @@ function seleccionarMascotaJugador() {
 }
 
 function seleccionarMokepon(mascotajugador) {
-    fetch(`http://192.168.1.60:8080/mokepon/${jugadorId}`, {
+    fetch(`${URL}/mokepon/${jugadorId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -273,7 +275,7 @@ function secuenciaAtaque() {
 }
 
 function enviarAtaques() {
-    fetch(`http://192.168.1.60:8080/mokepon/${jugadorId}/ataques`, {
+    fetch(`${URL}/mokepon/${jugadorId}/ataques`, {
         method: "post",
         headers:{
             "Content-Type" : "application/json"
@@ -287,7 +289,7 @@ function enviarAtaques() {
 }
 
 function obtenerAtaques() {
-    fetch(`http://192.168.1.60:8080/mokepon/${enemigoId}/ataques`)
+    fetch(`${URL}/mokepon/${enemigoId}/ataques`)
         .then (function(res){
             if (res.ok){
                 res.json()
@@ -304,7 +306,6 @@ function obtenerAtaques() {
 function seleccionarMascotaEnemigo(enemigo) {
     spanMascotaEnemigo.innerHTML = enemigo.nombre
     ataquesMokeponEnemigo = enemigo.ataques
-    secuenciaAtaque()
 }
 
 function ataquealeatorioEnemigo() {
@@ -426,7 +427,7 @@ function pintarCanvas() {
 }
 
 function enviarPosicion(x, y) {
-    fetch(`http://192.168.1.60:8080/mokepon/${jugadorId}/posicion`, {
+    fetch(`${URL}/mokepon/${jugadorId}/posicion`, {
         method: "post",
         headers: {
             "Content-Type": "application/json"
@@ -550,6 +551,7 @@ function revisarColision(enemigo){
     sectionVerMapa.style.display = "none"
     sectionseleccionarataque.style.display = "flex"
     seleccionarMascotaEnemigo(enemigo)
+    secuenciaAtaque()
 }
 
 window.addEventListener("load", iniciarjuego)
