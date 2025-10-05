@@ -172,7 +172,6 @@ function iniciarjuego () {
 }
 
 function unirseAlJuego () {
-    //cambiar local-host por la ip del wifi al que este conectado
     fetch(`${URL}/unirse`)
         .then(function(res) {
             if (res.ok) {
@@ -308,19 +307,6 @@ function seleccionarMascotaEnemigo(enemigo) {
     ataquesMokeponEnemigo = enemigo.ataques
 }
 
-function ataquealeatorioEnemigo() {
-    let ataquealeatorio = aleatorio (0, ataquesMokeponEnemigo.length - 1)
-
-    if (ataquealeatorio == 0 || ataquealeatorio ==1) {
-        ataqueEnemigo.push("FUEGO")
-    } else if (ataquealeatorio == 3 || ataquealeatorio ==4) {
-        ataqueEnemigo.push("AGUA")
-    } else {
-        ataqueEnemigo.push("TIERRA")
-    }
-    iniciarPelea()
-}
-
 function iniciarPelea(){
     if (ataquejugador.length === 5) {
         combate()
@@ -330,7 +316,6 @@ function iniciarPelea(){
 function indexAmbosOponentes (jugador, enemigo) {
     indexAtaqueJugador = ataquejugador[jugador]
     indexAtaqueEnemigo = ataqueEnemigo[enemigo]
-    
 }
 
 function combate(){
@@ -378,7 +363,7 @@ function revisarvictorias () {
 
 function crearmensaje(resultado) {
 
-    let nuevoataquedeljugar = document.createElement("p")
+    let nuevoataquedeljugar = document.createElement("p") 
     let nuevoataquedelenemigo = document.createElement("p")
 
     sectionMensajes.innerHTML = resultado
